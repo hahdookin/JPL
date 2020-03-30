@@ -20,10 +20,7 @@
  *
  */
 
-// 8 plus 4
-// { "8", "plus", "4" }
-
-std::vector<std::string> split_string(std::string line, char delimiter);
+std::vector<std::string> split_string(std::string line, char delimiter = ' ');
 bool bIsInteger(std::string s);
 bool bIsFloat(std::string s);
 bool bIsStringLiteral(std::string s);
@@ -75,10 +72,10 @@ namespace jess
         // Prints token detail
         void print()
         {
-            if (this->type == 'I') std::cout << this->sValue << " | " << this->type << " | " << this->nValue << std::endl;
-            if (this->type == 'F') std::cout << this->sValue << " | " << this->type << " | " << this->fValue << std::endl;
-            if (this->type == 'B') std::cout << this->sValue << " | " << this->type << " | " << this->bValue << std::endl;
-            if (this->type == 'O') std::cout << this->sValue << " | " << this->type << " | " << std::endl;
+            if (this->type == 'I') std::cout << "sVal: " << this->sValue << " | T: " << this->type << " | nVal: " << this->nValue << std::endl;
+            if (this->type == 'F') std::cout << "sVal: " << this->sValue << " | T: " << this->type << " | fVal: " << this->fValue << std::endl;
+            if (this->type == 'B') std::cout << "sVal: " << this->sValue << " | T: " << this->type << " | bVal: " << this->bValue << std::endl;
+            if (this->type == 'O') std::cout << "sVal: " << this->sValue << " | T: " << this->type << " | " << std::endl;
         }
 
         // Determines the type of the token i.e. Int, Bool, Char
@@ -109,7 +106,8 @@ namespace jess
             }
         }
 
-        Token operator + (Token &obj) {
+        Token operator + (Token &obj) 
+        {
             Token res;
             if (this->type == 'F' || obj.type == 'F')
             {
@@ -122,6 +120,61 @@ namespace jess
             }
             
             return res;
+        }
+
+        Token operator - (Token &obj) 
+        {
+            Token res;
+            if (this->type == 'F' || obj.type == 'F')
+            {
+                res.type = 'F';
+                res.fValue = this->fValue - obj.fValue;
+            }
+            else {
+                res.type = this->type;
+                res.nValue = this->nValue - obj.nValue;
+            }
+
+            return res;
+        }
+
+        Token operator * (Token &obj)
+        {
+            Token res;
+            if (this->type == 'F' || obj.type == 'F')
+            {
+                res.type = 'F';
+                res.fValue = this->fValue * obj.fValue;
+            }
+            else {
+                res.type = this->type;
+                res.nValue = this->nValue * obj.nValue;
+            }
+
+            return res;
+        }
+
+        Token operator / (Token &obj)
+        {
+            Token res;
+            if (this->type == 'F' || obj.type == 'F')
+            {
+                res.type = 'F';
+                res.fValue = this->fValue / obj.fValue;
+            }
+            else {
+                res.type = this->type;
+                res.nValue = this->nValue / obj.nValue;
+            }
+
+            return res;
+        }
+
+        Token operator % (Token &obj)
+        {
+            Token res;
+            res.type = 'I';
+            res.nValue = this->nValue % obj.nValue;
         }
     };
     
@@ -137,6 +190,14 @@ namespace jess
         void append(Token token)
         {
             this->line.push_back(token);
+        }
+        void interpret_line()
+        {
+            // iterate over tokens in line
+
+            // figure out grammar of line
+
+            // maybe return what to do
         }
     };
 }
@@ -189,23 +250,20 @@ int main()
     //    code.close();
     //}
 
-    jess::Tokenized_Line line;
-    jess::Token one("5.12");
-    jess::Token two("true");
-    jess::Token three("123");
-    jess::Token four("minus");
+    std::string code = "say 5.2 plus 2";
+    std::vector<std::string> code_split = split_string(code);
 
-    line.append(one);
-    line.append(two);
-    line.append(three);
+    jess::Tokenized_Line tok_line;
+    for (auto word : code_split)
+    {
+        jess::Token token(word);
+        tok_line.append(token);
+    }
+    for (auto token : tok_line.line)
+    {
+        token.print();
+    }
     
-    jess::Token a("5.25");
-    jess::Token b("3.25");
-
-    jess::Token res = a + b;
-
-    res.print();
-
     return 0;
 }
 
@@ -289,4 +347,8 @@ float perform_operation(float a, float b, std::string op)
     if (op == "minus") return a - b;
     if (op == "times") return a * b;
     if (op == "dividedby") return a / b;
+}
+void perform_io(jess::Token obj, std::string op)
+{
+    if (op == "say") std::cout << obj.sValue;
 }
