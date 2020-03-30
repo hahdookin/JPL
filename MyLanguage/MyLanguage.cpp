@@ -181,8 +181,6 @@ int main()
     //                    int res = perform_operation(tok_line.line[i - 1].fValue, tok_line.line[i + 1].fValue, tok_line.line[i].sValue);
     //                    std::cout << res << std::endl;
     //                }
-
-
     //                
     //            }
     //        }
