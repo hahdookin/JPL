@@ -7,6 +7,7 @@
 
 /**********************************
  * Jess Programming Language (JPL)
+ * Juevenile Esoteric Scripting System (JESS)
  * Types:
  * Int  I
  * Float F
@@ -52,7 +53,7 @@ namespace jess
     class Token
     {
     public:
-        char type;
+        unsigned char type;
         std::string sValue;
 
         int nValue;
@@ -60,98 +61,152 @@ namespace jess
         bool bValue;
 
     public:
+        Token()
+        {
+
+        }
+
         Token(std::string value)
         {
             this->sValue = value;
+            this->set_type();
         }
 
+        // Prints token detail
+        void print()
+        {
+            if (this->type == 'I') std::cout << this->sValue << " | " << this->type << " | " << this->nValue << std::endl;
+            if (this->type == 'F') std::cout << this->sValue << " | " << this->type << " | " << this->fValue << std::endl;
+            if (this->type == 'B') std::cout << this->sValue << " | " << this->type << " | " << this->bValue << std::endl;
+            if (this->type == 'O') std::cout << this->sValue << " | " << this->type << " | " << std::endl;
+        }
+
+        // Determines the type of the token i.e. Int, Bool, Char
         void set_type()
         {
             if (bIsOperator(this->sValue)) this->type = 'O';
 
-            if (bIsInteger(this->sValue))
+            else if (bIsInteger(this->sValue))
             {
                 this->type = 'I';
                 this->nValue = std::stoi(this->sValue);
                 this->fValue = std::stof(this->sValue);
             }
 
-            if (bIsFloat(this->sValue))
+            else if (bIsFloat(this->sValue))
             {
                 this->type = 'F';
                 this->fValue = std::stof(this->sValue);
                 this->nValue = std::stoi(this->sValue);
             }
 
-            if (bIsStringLiteral(this->sValue)) this->type = 'S';
+            else if (bIsStringLiteral(this->sValue)) this->type = 'S';
 
-            if (bIsBool(this->sValue))
+            else if (bIsBool(this->sValue))
             {
                 this->type = 'B';
                 this->bValue = this->sValue == "true";
             }
+        }
+
+        Token operator + (Token &obj) {
+            Token res;
+            if (this->type == 'F' || obj.type == 'F')
+            {
+                res.type = 'F';
+                res.fValue = this->fValue + obj.fValue;
+            }
+            else {
+                res.type = this->type;
+                res.nValue = this->nValue + obj.nValue;
+            }
+            
+            return res;
         }
     };
     
     class Tokenized_Line
     {
     public:
+        std::vector<Token> line = {};
+    public:
         Tokenized_Line()
         {
 
+        }
+        void append(Token token)
+        {
+            this->line.push_back(token);
         }
     };
 }
 
 int main()
 {
-    std::string file = "code.txt";
+    //std::string file = "code.txt";
 
-    std::string line;
-    std::ifstream code(file);
+    //std::string line;
+    //std::ifstream code(file);
 
-    if (code.is_open())
-    {
-        while (std::getline(code, line))
-        {
-            std::vector<std::string> line_split = split_string(line, ' ');
+    //if (code.is_open())
+    //{
+    //    while (std::getline(code, line))
+    //    {
+    //        std::vector<std::string> line_split = split_string(line, ' ');
 
-            std::vector<jess::Token> tokenized_line = {}; // { I 5 , O plus, I 8 }
+    //        jess::Tokenized_Line tok_line; // { I 5 , O plus, I 8 }
 
-            for (auto word : line_split)
-            {
-                jess::Token token(word);
-                token.set_type();
-                tokenized_line.push_back(token);
+    //        for (auto word : line_split)
+    //        {
+    //            jess::Token token(word);
+    //            token.set_type();
+    //            tok_line.append(token);
 
-                /*std::cout << token.sValue << " : " << token.type << " : ";
-                if (token.type == 'I') std::cout << token.nValue;
-                if (token.type == 'B') std::cout << token.bValue;
-                std::cout << std::endl;*/
-            }
+    //            /*std::cout << token.sValue << " : " << token.type << " : ";
+    //            if (token.type == 'I') std::cout << token.nValue;
+    //            if (token.type == 'B') std::cout << token.bValue;
+    //            std::cout << std::endl;*/
+    //        }
 
-            for (int i = 0; i < tokenized_line.size(); ++i)
-            {
-                if (tokenized_line[i].type == 'O')
-                {
-                    // Int to float conversion
-                    if (tokenized_line[i - 1].type == 'F' || tokenized_line[i + 1].type == 'F') {
-                        float res = perform_operation(tokenized_line[i - 1].fValue, tokenized_line[i + 1].fValue, tokenized_line[i].sValue);
-                        std::cout << res << std::endl;
-                    }
-                    else {
-                        int res = perform_operation(tokenized_line[i - 1].fValue, tokenized_line[i + 1].fValue, tokenized_line[i].sValue);
-                        std::cout << res << std::endl;
-                    }
+    //        for (int i = 0; i < tok_line.line.size(); ++i)
+    //        {
+    //            if (tok_line.line[i].type == 'O')
+    //            {
+    //                // Int to float conversion
+    //                if (tok_line.line[i - 1].type == 'F' || tok_line.line[i + 1].type == 'F') {
+    //                    float res = perform_operation(tok_line.line[i - 1].fValue, tok_line.line[i + 1].fValue, tok_line.line[i].sValue);
+    //                    std::cout << res << std::endl;
+    //                }
+    //                else {
+    //                    int res = perform_operation(tok_line.line[i - 1].fValue, tok_line.line[i + 1].fValue, tok_line.line[i].sValue);
+    //                    std::cout << res << std::endl;
+    //                }
 
 
-                    
-                }
-            }
-            
-        }
-        code.close();
-    }
+    //                
+    //            }
+    //        }
+    //        
+    //    }
+    //    code.close();
+    //}
+
+    jess::Tokenized_Line line;
+    jess::Token one("5.12");
+    jess::Token two("true");
+    jess::Token three("123");
+    jess::Token four("minus");
+
+    line.append(one);
+    line.append(two);
+    line.append(three);
+    
+    jess::Token a("5.25");
+    jess::Token b("3.25");
+
+    jess::Token res = a + b;
+
+    res.print();
 
     return 0;
 }

@@ -1,8 +1,6 @@
 ﻿  MyLanguage.cpp
-C:\Users\paperboy\source\repos\MyLanguage\MyLanguage\MyLanguage.cpp(124,31): warning C4018: '<': signed/unsigned mismatch
-C:\Users\paperboy\source\repos\MyLanguage\MyLanguage\MyLanguage.cpp(133,33): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
-C:\Users\paperboy\source\repos\MyLanguage\MyLanguage\MyLanguage.cpp(155,23): warning C4018: '<': signed/unsigned mismatch
-C:\Users\paperboy\source\repos\MyLanguage\MyLanguage\MyLanguage.cpp(185,23): warning C4018: '<': signed/unsigned mismatch
-C:\Users\paperboy\source\repos\MyLanguage\MyLanguage\MyLanguage.cpp(222): warning C4715: 'perform_operation': not all control paths return a value
-C:\Users\paperboy\source\repos\MyLanguage\MyLanguage\MyLanguage.cpp(229): warning C4715: 'perform_operation': not all control paths return a value
+C:\Users\paperboy\source\repos\MyLanguage\MyLanguage\MyLanguage.cpp(220,23): warning C4018: '<': signed/unsigned mismatch
+C:\Users\paperboy\source\repos\MyLanguage\MyLanguage\MyLanguage.cpp(250,23): warning C4018: '<': signed/unsigned mismatch
+C:\Users\paperboy\source\repos\MyLanguage\MyLanguage\MyLanguage.cpp(287): warning C4715: 'perform_operation': not all control paths return a value
+C:\Users\paperboy\source\repos\MyLanguage\MyLanguage\MyLanguage.cpp(294): warning C4715: 'perform_operation': not all control paths return a value
   MyLanguage.vcxproj -> C:\Users\paperboy\source\repos\MyLanguage\Debug\MyLanguage.exe
