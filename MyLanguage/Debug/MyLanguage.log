@@ -1,5 +1,0 @@
-﻿  MyLanguage.cpp
-C:\Users\paperboy\source\repos\MyLanguage\MyLanguage\JPL.h(231,23): warning C4018: '<': signed/unsigned mismatch
-C:\Users\paperboy\source\repos\MyLanguage\MyLanguage\JPL.h(261,23): warning C4018: '<': signed/unsigned mismatch
-C:\Users\paperboy\source\repos\MyLanguage\MyLanguage\JPL.h(318): warning C4715: 'perform_operation': not all control paths return a value
-  MyLanguage.vcxproj -> C:\Users\paperboy\source\repos\MyLanguage\Debug\MyLanguage.exe

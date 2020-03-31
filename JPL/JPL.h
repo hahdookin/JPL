@@ -24,6 +24,7 @@ namespace jess {
     class Tokenized_Line;
 }
 
+// Function declarations
 std::vector<std::string> split_string(std::string line, char delimiter = ' ');
 bool bIsInteger(std::string s);
 bool bIsFloat(std::string s);
