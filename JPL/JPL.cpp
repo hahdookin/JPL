@@ -26,37 +26,38 @@ int main()
     //        for (auto word : line_split)
     //        {
     //            jess::Token token(word);
-    //            token.set_type();
     //            tok_line.append(token);
-
-    //            /*std::cout << token.sValue << " : " << token.type << " : ";
-    //            if (token.type == 'I') std::cout << token.nValue;
-    //            if (token.type == 'B') std::cout << token.bValue;
-    //            std::cout << std::endl;*/
     //        }
 
-    //        for (int i = 0; i < tok_line.line.size(); ++i)
-    //        {
-    //            if (tok_line.line[i].type == 'O')
-    //            {
-    //                // Int to float conversion
-    //                if (tok_line.line[i - 1].type == 'F' || tok_line.line[i + 1].type == 'F') {
-    //                    float res = perform_operation(tok_line.line[i - 1].fValue, tok_line.line[i + 1].fValue, tok_line.line[i].sValue);
-    //                    std::cout << res << std::endl;
-    //                }
-    //                else {
-    //                    int res = perform_operation(tok_line.line[i - 1].fValue, tok_line.line[i + 1].fValue, tok_line.line[i].sValue);
-    //                    std::cout << res << std::endl;
-    //                }
-    //                
-    //            }
-    //        }
+
+    //        tok_line.interpret_line();
     //        
     //    }
     //    code.close();
     //}
 
-    std::string code = "say 5.2 plus 2";
+    std::vector<std::string> all_code =
+    {
+        "say 10 times 2",
+        "say 15 minus 3.2",
+        "say 7.2 modulus 3",
+        "say 18 dividedby 6",
+        "say 5.25 plus .25"
+    };
+
+    for (auto line : all_code)
+    {
+        std::vector<std::string> code_split = split_string(line);
+        jess::Tokenized_Line tok_line;
+        for (auto term : code_split)
+        {
+            jess::Token token(term);
+            tok_line.append(token);
+        }
+        tok_line.interpret_line();
+    }
+
+    /*std::string code = "say 9.4 times 4";
     std::vector<std::string> code_split = split_string(code);
 
     jess::Tokenized_Line tok_line;
@@ -65,10 +66,8 @@ int main()
         jess::Token token(word);
         tok_line.append(token);
     }
-    for (auto token : tok_line.line)
-    {
-        token.print();
-    }
+    
+    tok_line.interpret_line();*/
 
     return 0;
 }

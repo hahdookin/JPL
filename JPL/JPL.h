@@ -32,7 +32,8 @@ bool bIsStringLiteral(std::string s);
 bool bIsOperator(std::string s);
 bool bIsStdFunc(std::string s);
 bool bIsBool(std::string s);
-jess::Token perform_operation(jess::Token& tok1, jess::Token& tok2, std::string op);
+jess::Token perform_operation(jess::Token &tok1, jess::Token &tok2, std::string op);
+void perform_io(jess::Token obj, std::string op);
 
 // End of declarations
 
@@ -61,8 +62,8 @@ namespace jess
         unsigned char type;
         std::string sValue;
 
-        signed int nValue;
-        float fValue;
+        signed long int nValue;
+        double fValue;
         bool bValue;
 
     public:
@@ -207,14 +208,42 @@ namespace jess
         void interpret_line()
         {
             // iterate over tokens in line
-            // Check for operator
+            // Check for operator and reduce line
+            // { say, 5, plus, 2 } => { say, 7 }
             for (int i = this->line.size() - 1; i >= 0; --i)
             {
                 if (this->line[i].type == 'O')
                 {
+                    Token res;
+                    /*if (this->line[i].sValue == "plus")         res = this->line[i - 1] + this->line[i + 1];
+                    if (this->line[i].sValue == "minus")        res = this->line[i - 1] - this->line[i + 1];
+                    if (this->line[i].sValue == "times")        res = this->line[i - 1] * this->line[i + 1];
+                    if (this->line[i].sValue == "dividedby")    res = this->line[i - 1] / this->line[i + 1];
+                    if (this->line[i].sValue == "modulus")      res = this->line[i - 1] % this->line[i + 1];*/
+
+                    res = perform_operation(this->line[i - 1], this->line[i + 1], this->line[i].sValue);
+
+                    // COME BACK TO THIS
+                    this->line.erase(this->line.begin() + 1, this->line.end());
+
+                    this->line.push_back(res);
 
                 }
             }
+
+            for (int i = 0; i < this->line.size(); ++i)
+            {
+                if (this->line[i].type == '0')
+                {
+                    perform_io(this->line[i + 1], this->line[i].sValue);
+                }
+            }
+
+
+            /*for (auto tok : this->line)
+            {
+                tok.print();
+            }*/
 
             // figure out grammar of line
 
@@ -298,26 +327,21 @@ bool bIsBool(std::string s)
     return (s == "true") || (s == "false");
 }
 
-jess::Token perform_operation(jess::Token& a, jess::Token& b, std::string op)
+jess::Token perform_operation(jess::Token &a, jess::Token &b, std::string op)
 {
-    if ((a.type == 'F' || b.type == 'F') && op != "modulus")
-    {
-        if (op == "plus") return a + b;
-        if (op == "minus") return a - b;
-        if (op == "times") return a * b;
-        if (op == "dividedby") return a / b;
-    }
-    else
-    {
-        if (op == "plus") return a + b;
-        if (op == "minus") return a - b;
-        if (op == "times") return a * b;
-        if (op == "dividedby") return a / b;
-        if (op == "modulus") return a % b;
-    }
-
+    if (op == "plus") return a + b;
+    if (op == "minus") return a - b;
+    if (op == "times") return a * b;
+    if (op == "dividedby") return a / b;
+    if (op == "modulus") return a % b;
 }
 void perform_io(jess::Token obj, std::string op)
 {
-    if (op == "say") std::cout << obj.sValue << std::endl;
+    if (op == "say")
+    {
+        if (obj.type == 'F') std::cout << obj.fValue << std::endl;
+        if (obj.type == 'I') std::cout << obj.nValue << std::endl;
+        if (obj.type == 'B') std::cout << obj.bValue << std::endl;
+        if (obj.type == 'S') std::cout << obj.sValue << std::endl;
+    }
 }
