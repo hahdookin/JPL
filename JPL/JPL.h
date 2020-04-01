@@ -1,7 +1,12 @@
 #pragma once
 
+#include <string>
+#include <vector>
+#include <unordered_map>
+
+
 /**********************************
- * Jess Programming Language (JPL)
+ * JESS Programming Language (JPL)
  * Juevenile Esoteric Scripting System (JESS)
  * Types:
  * Int  I
@@ -11,8 +16,8 @@
  * String S
  * StdFunc  0
  * Operator:
- *  +      -      *         /         %
- * plus, minus, times, divided by, modulus
+ *  +      -      *        /         %     =
+ * plus, minus, times, dividedby, modulus, is
  */
 
 
@@ -38,21 +43,18 @@ void perform_io(jess::Token obj, std::string op);
 // End of declarations
 
 const std::string operator_terms[] = {
-    "plus", "minus", "times", "dividedby", "modulus"
+    "plus", "minus", "times", "dividedby", 
+    "modulus", "is"
 };
 
 const std::string func_terms[] = {
     "say", "get"
 };
 
-const std::unordered_map<std::string, std::string> operators =
-{
-    {"plus", "+"},
-    {"minus", "-"},
-    {"times", "*"},
-    {"divideby", "/"},
-    {"modulus", "%"}
-};
+//const std::unordered_map<std::string, std::string> operators =
+//{
+//    {"plus", operator_terms}
+//};
 
 namespace jess
 {
@@ -62,7 +64,7 @@ namespace jess
         unsigned char type;
         std::string sValue;
 
-        signed long int nValue;
+        int nValue;
         double fValue;
         bool bValue;
 
@@ -81,11 +83,11 @@ namespace jess
         // Prints token detail
         void print()
         {
-            if (this->type == 'I') std::cout << "sVal: " << this->sValue << " | T: " << this->type << " | nVal: " << this->nValue << std::endl;
-            if (this->type == 'F') std::cout << "sVal: " << this->sValue << " | T: " << this->type << " | fVal: " << this->fValue << std::endl;
-            if (this->type == 'B') std::cout << "sVal: " << this->sValue << " | T: " << this->type << " | bVal: " << this->bValue << std::endl;
-            if (this->type == 'O') std::cout << "sVal: " << this->sValue << " | T: " << this->type << " | " << std::endl;
-            if (this->type == '0') std::cout << "sVal: " << this->sValue << " | T: " << this->type << " | " << std::endl;
+            if (this->type == 'I') std::cout << "T: " << this->type << " | sVal: " << this->sValue << " | nVal: " << this->nValue << std::endl;
+            if (this->type == 'F') std::cout << "T: " << this->type << " | sVal: " << this->sValue << " | fVal: " << this->fValue << std::endl;
+            if (this->type == 'B') std::cout << "T: " << this->type << " | sVal: " << this->sValue << " | bVal: " << this->bValue << std::endl;
+            if (this->type == 'O') std::cout << "T: " << this->type << " | sVal: " << this->sValue << std::endl;
+            if (this->type == '0') std::cout << "T: " << this->type << " | sVal: " << this->sValue << std::endl;
         }
 
         // Determines the type of the token i.e. Int, Bool, Char
@@ -99,13 +101,14 @@ namespace jess
             {
                 this->type = 'I';
                 this->nValue = std::stoi(this->sValue);
-                this->fValue = std::stof(this->sValue);
+                this->fValue = std::stod(this->sValue);
             }
 
             else if (bIsFloat(this->sValue))
             {
+                if (this->sValue[0] == '.') this->sValue = "0" + this->sValue;
                 this->type = 'F';
-                this->fValue = std::stof(this->sValue);
+                this->fValue = std::stod(this->sValue);
                 this->nValue = std::stoi(this->sValue);
             }
 
@@ -215,12 +218,7 @@ namespace jess
                 if (this->line[i].type == 'O')
                 {
                     Token res;
-                    /*if (this->line[i].sValue == "plus")         res = this->line[i - 1] + this->line[i + 1];
-                    if (this->line[i].sValue == "minus")        res = this->line[i - 1] - this->line[i + 1];
-                    if (this->line[i].sValue == "times")        res = this->line[i - 1] * this->line[i + 1];
-                    if (this->line[i].sValue == "dividedby")    res = this->line[i - 1] / this->line[i + 1];
-                    if (this->line[i].sValue == "modulus")      res = this->line[i - 1] % this->line[i + 1];*/
-
+                    
                     res = perform_operation(this->line[i - 1], this->line[i + 1], this->line[i].sValue);
 
                     // COME BACK TO THIS
