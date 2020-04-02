@@ -31,38 +31,45 @@ namespace jess {
 
 // Function declarations
 std::vector<std::string> split_string(std::string line, char delimiter = ' ');
+
 bool bIsInteger(std::string s);
 bool bIsFloat(std::string s);
 bool bIsStringLiteral(std::string s);
 bool bIsOperator(std::string s);
 bool bIsStdFunc(std::string s);
 bool bIsBool(std::string s);
+bool bIsVariable(std::string s);
+bool bVariableExists(std::string varName);
+
 jess::Token perform_operation(jess::Token &tok1, jess::Token &tok2, std::string op);
-void perform_io(jess::Token obj, std::string op);
+void say(jess::Token &obj);
+void get(std::string varName);
 
 // End of declarations
 
 const std::string operator_terms[] = {
     "plus", "minus", "times", "dividedby", 
-    "modulus", "is"
+    "modulus"
 };
 
 const std::string func_terms[] = {
     "say", "get"
 };
 
-//const std::unordered_map<std::string, std::string> operators =
-//{
-//    {"plus", operator_terms}
-//};
+const std::string assignment_operator = "is";
+
+// Stores token variables
+std::unordered_map<std::string, jess::Token> variables = {};
 
 namespace jess
 {
     class Token
     {
     public:
-        unsigned char type;
-        std::string sValue;
+        std::string vName = "";
+
+        char type; 
+        std::string sValue = "";
 
         int nValue;
         double fValue;
@@ -83,41 +90,79 @@ namespace jess
         // Prints token detail
         void print()
         {
-            if (this->type == 'I') std::cout << "T: " << this->type << " | sVal: " << this->sValue << " | nVal: " << this->nValue << std::endl;
-            if (this->type == 'F') std::cout << "T: " << this->type << " | sVal: " << this->sValue << " | fVal: " << this->fValue << std::endl;
-            if (this->type == 'B') std::cout << "T: " << this->type << " | sVal: " << this->sValue << " | bVal: " << this->bValue << std::endl;
-            if (this->type == 'O') std::cout << "T: " << this->type << " | sVal: " << this->sValue << std::endl;
-            if (this->type == '0') std::cout << "T: " << this->type << " | sVal: " << this->sValue << std::endl;
+            std::cout << "T: " << this->type;
+            std::cout << " | sVal: " << this->sValue;
+            std::cout << " | nVal: " << this->nValue;
+            std::cout << " | fVal: " << this->fValue;
+            std::cout << " | bVal: " << this->bValue;
+            std::cout << " | vName: " << this->vName;
+
+            std::cout << std::endl;          
         }
 
         // Determines the type of the token i.e. Int, Bool, Char
         void set_type()
         {
-            if (bIsOperator(this->sValue)) this->type = 'O';
+            if (bIsOperator(this->sValue))
+            {
+                this->type = 'O';
 
-            else if (bIsStdFunc(this->sValue)) this->type = '0';
+                this->nValue = 0;
+                this->fValue = 0.0;
+                this->bValue = true;
+            }
+
+            else if (bIsStdFunc(this->sValue))
+            {
+                this->type = '0';
+
+                this->nValue = 1;
+                this->fValue = 1.0;
+                this->bValue = true;
+            }
 
             else if (bIsInteger(this->sValue))
             {
                 this->type = 'I';
                 this->nValue = std::stoi(this->sValue);
+
                 this->fValue = std::stod(this->sValue);
+                this->bValue = this->nValue != 0;
             }
 
             else if (bIsFloat(this->sValue))
             {
                 if (this->sValue[0] == '.') this->sValue = "0" + this->sValue;
+
                 this->type = 'F';
                 this->fValue = std::stod(this->sValue);
+
                 this->nValue = std::stoi(this->sValue);
+                this->bValue = this->fValue != 0;
             }
 
-            else if (bIsStringLiteral(this->sValue)) this->type = 'S';
+            else if (bIsStringLiteral(this->sValue))
+            {
+                this->type = 'S';
+
+                this->nValue = 1;
+                this->fValue = 1;
+                this->bValue = this->sValue == "";
+            }
 
             else if (bIsBool(this->sValue))
             {
                 this->type = 'B';
                 this->bValue = this->sValue == "true";
+
+                this->nValue = this->bValue == true ? 1 : 0;
+                this->fValue = this->bValue == true ? 1 : 0;
+            }
+
+            else if (bIsVariable(this->sValue))
+            {
+                this->type = 'V';
+                this->vName = this->sValue;
             }
         }
 
@@ -202,7 +247,7 @@ namespace jess
     public:
         Tokenized_Line()
         {
-
+            
         }
         void append(Token token)
         {
@@ -213,6 +258,8 @@ namespace jess
             // iterate over tokens in line
             // Check for operator and reduce line
             // { say, 5, plus, 2 } => { say, 7 }
+            // { get, x }
+            // { say, x, plus, 5 }
             for (int i = this->line.size() - 1; i >= 0; --i)
             {
                 if (this->line[i].type == 'O')
@@ -233,16 +280,29 @@ namespace jess
             {
                 if (this->line[i].type == '0')
                 {
-                    perform_io(this->line[i + 1], this->line[i].sValue);
+                    if (this->line[i].sValue == "say")
+                    {
+                        if (bVariableExists(this->line[i + 1].vName))
+                        {
+                            say(variables[this->line[i + 1].vName]);
+                        }
+                        else {
+                            say(this->line[i + 1]);
+                        }
+                        
+                    }
+                        
+
+                    if (this->line[i].sValue == "get")
+                    {
+                        get(this->line[i + 1].vName);
+                    }
+                        
                 }
             }
 
 
-            /*for (auto tok : this->line)
-            {
-                tok.print();
-            }*/
-
+            
             // figure out grammar of line
 
             // maybe return what to do
@@ -282,7 +342,7 @@ bool bIsInteger(std::string s)
     return !s.empty() && it == s.end();
 }
 
-// Determines if the token values is a floating point
+// Determines if the token value is a floating point
 bool bIsFloat(std::string s)
 {
     int period_counter = 0;
@@ -325,6 +385,25 @@ bool bIsBool(std::string s)
     return (s == "true") || (s == "false");
 }
 
+// Determines if token is a variable
+bool bIsVariable(std::string s)
+{
+    // Make variable name not contain the following:
+    // !@#$%^&*()+-";></?:'~`[]{}|\.
+    return true;
+}
+
+// Checks if variable exists
+bool bVariableExists(std::string varName)
+{
+    std::unordered_map<std::string, jess::Token>::iterator it;
+    for (it = variables.begin(); it != variables.end(); it++)
+    {
+        if (it->first == varName) return true;
+    }
+    return false;
+}
+
 jess::Token perform_operation(jess::Token &a, jess::Token &b, std::string op)
 {
     if (op == "plus") return a + b;
@@ -333,13 +412,19 @@ jess::Token perform_operation(jess::Token &a, jess::Token &b, std::string op)
     if (op == "dividedby") return a / b;
     if (op == "modulus") return a % b;
 }
-void perform_io(jess::Token obj, std::string op)
+void say(jess::Token &obj)
 {
-    if (op == "say")
-    {
-        if (obj.type == 'F') std::cout << obj.fValue << std::endl;
-        if (obj.type == 'I') std::cout << obj.nValue << std::endl;
-        if (obj.type == 'B') std::cout << obj.bValue << std::endl;
-        if (obj.type == 'S') std::cout << obj.sValue << std::endl;
-    }
+    if (obj.type == 'F') std::cout << obj.fValue << std::endl;
+    if (obj.type == 'I') std::cout << obj.nValue << std::endl;
+    if (obj.type == 'B') std::cout << obj.bValue << std::endl;
+    if (obj.type == 'S') std::cout << obj.sValue << std::endl;
+  
+}
+void get(std::string varName) // { get, apple }
+{
+    std::string input;
+    std::cin >> input;
+    jess::Token token(input);
+    token.vName = varName;
+    variables[varName] = token;
 }

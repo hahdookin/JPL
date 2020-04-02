@@ -1,0 +1,4 @@
+BUGS 
+- a lot
+- Variables initialize with incorrect values
+- Empty string values "" dont initialize
