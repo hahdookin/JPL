@@ -1,5 +1,0 @@
-say 10 times 2
-say 15.5 minus 3.2
-say 7.2 modulus 3
-say 18 dividedby 6
-say 5.25 plus .25

@@ -1,0 +1,6 @@
+say "Enter a value for x:"
+get x
+say "Enter a value for y:"
+get y
+say "x times y is:"
+say x times y

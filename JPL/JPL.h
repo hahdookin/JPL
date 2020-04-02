@@ -174,6 +174,11 @@ namespace jess
                 res.type = 'F';
                 res.fValue = this->fValue + obj.fValue;
             }
+            else if (this->type == 'S')
+            {
+                res.type = 'S';
+                res.sValue = this->sValue.substr(0, this->sValue.size() - 1) + obj.sValue.substr(1, obj.sValue.size() - 1);
+            }
             else {
                 res.type = this->type;
                 res.nValue = this->nValue + obj.nValue;
