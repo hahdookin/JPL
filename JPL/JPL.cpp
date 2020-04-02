@@ -33,8 +33,9 @@ int main()
 
     std::vector<std::string> all_code =
     {
-        "say \"Enter:\"",
+        "say \"Enter a value for x:\"",
         "get x",
+        "say \"Your number + 5 is: \"",
         "say x plus 5"
     };
     for (auto code_line : all_code)

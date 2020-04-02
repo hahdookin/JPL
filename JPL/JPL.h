@@ -266,6 +266,9 @@ namespace jess
                 {
                     Token res;
                     
+                    if (bVariableExists(this->line[i + 1].vName)) this->line[i + 1] = variables[this->line[i + 1].vName];
+                    if (bVariableExists(this->line[i - 1].vName)) this->line[i - 1] = variables[this->line[i - 1].vName];
+
                     res = perform_operation(this->line[i - 1], this->line[i + 1], this->line[i].sValue);
 
                     // COME BACK TO THIS
@@ -280,19 +283,26 @@ namespace jess
             {
                 if (this->line[i].type == '0')
                 {
+                    // std SAY
                     if (this->line[i].sValue == "say")
                     {
+                                              
+
                         if (bVariableExists(this->line[i + 1].vName))
                         {
                             say(variables[this->line[i + 1].vName]);
                         }
                         else {
                             say(this->line[i + 1]);
+                            /*for (int j = i; j < this->line.size(); ++j)
+                            {
+                                say(this->line[j]);
+                            }*/
                         }
                         
                     }
                         
-
+                    // std GET
                     if (this->line[i].sValue == "get")
                     {
                         get(this->line[i + 1].vName);
@@ -310,25 +320,42 @@ namespace jess
     };
 }
 
-// Splits a string by a delimiter char
+// Splits string by delimiter character (fixed for not splitting spaces in string literals)
 std::vector<std::string> split_string(std::string line, char delimiter)
 {
     std::vector<std::string> split = {};
 
     std::string currentWord = "";
-    for (int i = 0; i < line.size(); ++i) {
-        if (line[i] == delimiter)
-        {
-            split.push_back(currentWord);
-            currentWord = "";
-        }
-        else if (i == line.size() - 1) {
-            currentWord += line[i];
-            split.push_back(currentWord);
+    bool inStringLiteral = false;
+    int nQuotMarks = 0;
+    for (unsigned int i = 0; i < line.size(); ++i) {
+        if (line[i] == '"' && !inStringLiteral) inStringLiteral = true;
+
+        if (!inStringLiteral) {
+            if (line[i] == delimiter)
+            {
+                if (currentWord != "") split.push_back(currentWord);
+                currentWord = "";
+            }
+            else if (i == line.size() - 1) {
+                currentWord += line[i];
+                split.push_back(currentWord);
+            }
+            else {
+                currentWord += line[i];
+            }
         }
         else {
+            if (line[i] == '"') ++nQuotMarks;
             currentWord += line[i];
+            if (line[i] == '"' && nQuotMarks == 2) {
+                inStringLiteral = false;
+                nQuotMarks = 0;
+                split.push_back(currentWord);
+                currentWord = "";
+            }
         }
+
     }
 
     return split;
