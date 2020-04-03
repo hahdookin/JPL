@@ -48,8 +48,9 @@ void get(std::string varName);
 // End of declarations
 
 const std::string operator_terms[] = {
-    "plus", "minus", "times", "dividedby", 
-    "modulus"
+    "plus", "+", "minus", "-", 
+    "times", "*", "dividedby", "/", 
+    "modulus", "%"
 };
 
 const std::string func_terms[] = {
@@ -98,6 +99,7 @@ namespace jess
             std::cout << " | vName: " << this->vName;
 
             std::cout << std::endl;          
+           
         }
 
         // Determines the type of the token i.e. Int, Bool, Char
@@ -107,8 +109,8 @@ namespace jess
             {
                 this->type = 'O';
 
-                this->nValue = 0;
-                this->fValue = 0.0;
+                this->nValue = 1;
+                this->fValue = 1.0;
                 this->bValue = true;
             }
 
@@ -163,9 +165,15 @@ namespace jess
             {
                 this->type = 'V';
                 this->vName = this->sValue;
+
+                //variables[this->vName] = *this;
+                
+                this->bValue = false;
+                this->nValue = 0;
+                this->fValue = 0.0;
             }
         }
-
+        
         Token operator + (Token& obj)
         {
             Token res;
@@ -243,6 +251,16 @@ namespace jess
 
             return res;
         }
+        /*Token operator = (Token& obj)
+        {
+            this->sValue = obj.sValue;
+            this->nValue = obj.nValue;
+            this->fValue = obj.fValue;
+            this->bValue = obj.bValue;
+            this->vName = obj.vName;
+
+            return *this;
+        }*/
     };
 
     class Tokenized_Line
@@ -265,14 +283,25 @@ namespace jess
             // { say, 5, plus, 2 } => { say, 7 }
             // { get, x }
             // { say, x, plus, 5 }
+
+            // Check for variable tokens and replace them with their values;
+            for (int i = 0; i < this->line.size(); ++i)
+            {
+                if (this->line[i].type == 'V')
+                    if (bVariableExists(this->line[i].vName))
+                    {
+                        this->line[i] = variables[this->line[i].vName];
+                    }
+            }
+
             for (int i = this->line.size() - 1; i >= 0; --i)
             {
                 if (this->line[i].type == 'O')
                 {
                     Token res;
                     
-                    if (bVariableExists(this->line[i + 1].vName)) this->line[i + 1] = variables[this->line[i + 1].vName];
-                    if (bVariableExists(this->line[i - 1].vName)) this->line[i - 1] = variables[this->line[i - 1].vName];
+                    //if (bVariableExists(this->line[i + 1].vName)) this->line[i + 1] = variables[this->line[i + 1].vName];
+                    //if (bVariableExists(this->line[i - 1].vName)) this->line[i - 1] = variables[this->line[i - 1].vName];
 
                     res = perform_operation(this->line[i - 1], this->line[i + 1], this->line[i].sValue);
 
@@ -288,6 +317,17 @@ namespace jess
             {
                 if (this->line[i].type == '0')
                 {
+                    // assignment operator
+                    // { x, is, 10 }
+                    if (this->line[i].sValue == "is")
+                    {
+                        std::string temp = this->line[i - 1].vName;
+                        this->line[i - 1] = this->line[i + 1];
+                        this->line[i - 1].vName = temp;
+                        variables[this->line[i - 1].vName] = this->line[i - 1]; // Updates the variable upon assignment
+
+                    }
+
                     // std SAY
                     if (this->line[i].sValue == "say")
                     {
@@ -405,6 +445,7 @@ bool bIsOperator(std::string s)
 // Determines if token is standard lib function
 bool bIsStdFunc(std::string s)
 {
+    if (s == assignment_operator) return true;
     for (auto func : func_terms) {
         if (s == func) return true;
     }
@@ -428,6 +469,7 @@ bool bIsVariable(std::string s)
 // Checks if variable exists
 bool bVariableExists(std::string varName)
 {
+    if (variables.empty()) return false;
     std::unordered_map<std::string, jess::Token>::iterator it;
     for (it = variables.begin(); it != variables.end(); it++)
     {
@@ -438,14 +480,15 @@ bool bVariableExists(std::string varName)
 
 jess::Token perform_operation(jess::Token &a, jess::Token &b, std::string op)
 {
-    if (op == "plus") return a + b;
-    if (op == "minus") return a - b;
-    if (op == "times") return a * b;
-    if (op == "dividedby") return a / b;
-    if (op == "modulus") return a % b;
+    if (op == "plus" || op == "+") return a + b;
+    if (op == "minus" || op == "-") return a - b;
+    if (op == "times" || op == "*") return a * b;
+    if (op == "dividedby" || op == "/") return a / b;
+    if (op == "modulus" || op == "%") return a % b;
 }
 void say(jess::Token &obj)
 {
+    if (obj.type == 'V') obj = variables[obj.vName];
     if (obj.type == 'F') std::cout << obj.fValue << std::endl;
     if (obj.type == 'I') std::cout << obj.nValue << std::endl;
     if (obj.type == 'B') std::cout << obj.bValue << std::endl;

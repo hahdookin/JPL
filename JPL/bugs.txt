@@ -1,6 +1,11 @@
 BUGS 
 - a lot
+- make x is x plus 1 work
+
 - Variables initialize with incorrect values
 - Empty string values "" dont initialize
 
 - Want to iterate through string and replace variables with tokens of their values
+	- think i did this
+
+- man i dont even know whats happening sometimes it works

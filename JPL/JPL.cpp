@@ -5,7 +5,7 @@
 
 int main()
 {
-    /*std::string file = "code.jess";
+    /*std::string file = "code.jess"; 
 
     std::string line;
     std::ifstream code(file);
@@ -33,12 +33,16 @@ int main()
 
     std::vector<std::string> all_code =
     {
-        "say \"Enter a value for x:\"",
+        /*"say \"Enter a value for x:\"",
         "get x",
         "say \"Enter a value for y:\"",
         "get y",
         "say \"x times y is: \"",
         "say x times y"
+        "x is 0",*/
+        "get x",
+        "x is 1 plus x",
+        "say x"
     };
     for (auto code_line : all_code)
     {
@@ -50,6 +54,13 @@ int main()
             tok_line.append(token);
         }
         tok_line.interpret_line();
+
+        /*for (auto tok : tok_line.line)
+        {
+            tok.print();
+        }*/
+        
+        
     }
 
     return 0;
