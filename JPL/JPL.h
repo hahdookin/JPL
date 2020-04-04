@@ -21,6 +21,7 @@
  */
 
 
+
  // All Declarations
 
  // Namespace declaration
@@ -47,6 +48,8 @@ void get(std::string varName);
 
 // End of declarations
 
+bool DEBUG_MODE = false;
+
 const std::string operator_terms[] = {
     "plus", "+", "minus", "-", 
     "times", "*", "dividedby", "/", 
@@ -64,6 +67,7 @@ std::unordered_map<std::string, jess::Token> variables = {};
 
 namespace jess
 {
+    
     class Token
     {
     public:
@@ -223,7 +227,7 @@ namespace jess
                 res.type = this->type;
                 res.nValue = this->nValue * obj.nValue;
             }
-
+            
             return res;
         }
 
@@ -287,11 +291,14 @@ namespace jess
             // Check for variable tokens and replace them with their values;
             for (int i = 0; i < this->line.size(); ++i)
             {
-                if (this->line[i].type == 'V')
-                    if (bVariableExists(this->line[i].vName))
-                    {
-                        this->line[i] = variables[this->line[i].vName];
-                    }
+                
+                if (bVariableExists(this->line[i].vName))
+                {
+                    // DEBUG
+                    if (DEBUG_MODE) std::cout << "Setting " << this->line[i].sValue << " to global variable: " << variables[this->line[i].vName].vName << std::endl;
+
+                    this->line[i] = variables[this->line[i].vName];
+                }
             }
 
             for (int i = this->line.size() - 1; i >= 0; --i)
@@ -325,6 +332,8 @@ namespace jess
                         this->line[i - 1] = this->line[i + 1];
                         this->line[i - 1].vName = temp;
                         variables[this->line[i - 1].vName] = this->line[i - 1]; // Updates the variable upon assignment
+                        // DEBUG
+                        if (DEBUG_MODE) std::cout << "Updating global variable: " << this->line[i - 1].vName;
 
                     }
 
@@ -502,4 +511,6 @@ void get(std::string varName) // { get, apple }
     jess::Token token(input);
     token.vName = varName;
     variables[varName] = token;
+    // DEBUG
+    if (DEBUG_MODE) std::cout << "Added glob variable: " << varName << std::endl;
 }

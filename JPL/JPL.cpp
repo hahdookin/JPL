@@ -5,11 +5,13 @@
 
 int main()
 {
+    DEBUG_MODE = true;
+
     /*std::string file = "code.jess"; 
 
     std::string line;
     std::ifstream code(file);
-
+    
     if (code.is_open())
     {
         while (std::getline(code, line))
@@ -29,23 +31,21 @@ int main()
             
         }
         code.close();
-    }*/ 
+    }*/
 
     std::vector<std::string> all_code =
     {
-        /*"say \"Enter a value for x:\"",
+        "say \"Enter a value for x:\"",
         "get x",
         "say \"Enter a value for y:\"",
         "get y",
-        "say \"x times y is: \"",
-        "say x times y"
-        "x is 0",*/
-        "get x",
-        "x is 1 plus x",
-        "say x"
+        "say x",
+        "say y"
     };
     for (auto code_line : all_code)
     {
+        if (DEBUG_MODE) std::cout << "#Global variables: " << variables.size() << std::endl;
+
         std::vector<std::string> code_line_split = split_string(code_line);
         jess::Tokenized_Line tok_line;
         for (auto word : code_line_split)
@@ -53,15 +53,19 @@ int main()
             jess::Token token(word);
             tok_line.append(token);
         }
-        tok_line.interpret_line();
-
-        /*for (auto tok : tok_line.line)
+        for (auto tok : tok_line.line)
         {
             tok.print();
-        }*/
+        }
+        std::cout << ">> ";
+        tok_line.interpret_line();
+
+        
+
+        
         
         
     }
-
+    
     return 0;
 }

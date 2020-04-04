@@ -1,0 +1,13 @@
+statement:
+  x is expression
+expression:
+  x1 oper x2 oper x3 oper ...
+  x
+
+say x1 x2 x3
+get x
+
+if cond do statement
+if cond1 and/or/ cond2 do statement
+
+

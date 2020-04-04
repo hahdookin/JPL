@@ -1,7 +1,7 @@
 BUGS 
 - a lot
 - make x is x plus 1 work
-
+- need to refactor assignment and say function
 - Variables initialize with incorrect values
 - Empty string values "" dont initialize
 
